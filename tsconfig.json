@@ -1,11 +1,13 @@
 {
   "include": ["src", "types"],
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
+    "module": "ES2022",
+    "target": "ES2022",
+    "allowJs": true,
+    "checkJs": false,
     "moduleResolution": "node",
     "jsx": "preserve",
-    "baseUrl": "./",
+    //"baseUrl": "./",
     /* paths - import rewriting/resolving */
     "paths": {
       // If you configured any Snowpack aliases, add them here.
@@ -14,16 +16,16 @@
       // More info: https://www.snowpack.dev/guides/streaming-imports
     },
     "allowSyntheticDefaultImports": true,
-    "importsNotUsedAsValues": "error",
     /* more strict checking for errors that per-file transpilers like `esbuild` would crash */
-    "isolatedModules": true,
+    //"isolatedModules": true,
     /* noEmit - We only use TypeScript for type checking. */
-    "noEmit": true,
+    //"noEmit": true,
     /* Additional Options */
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "useDefineForClassFields": true
+    "strict": false,
+    //"skipLibCheck": true,
+    //"forceConsistentCasingInFileNames": true,
+    //"resolveJsonModule": true,
+    //"useDefineForClassFields": true,
+    "esModuleInterop": true
   }
 }

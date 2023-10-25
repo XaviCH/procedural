@@ -3,9 +3,13 @@
  * When you're ready to start on your site, clear the file. Happy hacking!
  **/
 
-import confetti from 'canvas-confetti';
+import { Game } from './handlers/game';
 
-confetti.create(document.getElementById('canvas') as HTMLCanvasElement, {
-  resize: true,
-  useWorker: true,
-})({ particleCount: 200, spread: 200 });
+
+$(document).ready(async () => {  
+  const app = Game.instance();
+
+  app.setup(document.getElementById("game"),10);
+  app.run();
+
+})

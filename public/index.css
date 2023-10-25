@@ -1,14 +1,15 @@
-#img {
-  display: block;
-  margin: auto;
-  height: 128px;
-  width: 128px;
-  padding: 2rem;
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding:0;
+  overflow:hidden;
 }
 
-#canvas {
-  display: block;
-  margin: 2rem auto;
-  width: 540px;
-  height: 540px;
+#game {
+  position:fixed;
+  left:0;
+  top:0;
+  width: 100%;
+  height: 100%;
 }
