@@ -1,6 +1,6 @@
-# New Project
+# Procedural
 
-> ✨ Bootstrapped with Create Snowpack App (CSA).
+Procedural graphical enviroment create for browsers. 
 
 ## Available Scripts
 
