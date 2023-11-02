@@ -67,7 +67,6 @@ export class Game{
 
         device.queue.writeBuffer(cameraUniformBuffer, 0, mat4.perspective(mat4.create(), Math.PI/6, this.canvas.getBoundingClientRect().width/this.canvas.getBoundingClientRect().height, 0.1, 500));
         Mouse.instance().update();
-        keyboard.update(delta);
 
         this.world.update(delta);
         this.player.update(delta);

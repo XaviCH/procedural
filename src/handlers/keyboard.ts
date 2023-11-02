@@ -1,26 +1,26 @@
+export enum KEY { W, A, S, D, SHIFT, CONTROL, SPACE}
+
+const mapKey = {
+    "W": KEY.W, "w": KEY.W,
+    "A": KEY.A, "a": KEY.A,
+    "S": KEY.S, "s": KEY.S,
+    "D": KEY.D, "d": KEY.D,
+    "Shift": KEY.SHIFT,
+    "Control": KEY.CONTROL,
+    " ": KEY.SPACE
+}
+
+
 class Keyboard {
 
-    down: Set<string> = new Set();
-    keys: { keyup: Array<string>; keydown: Array<string>; } ;
-    _update: { keyup: Array<string>; keydown: Array<string>; } ;
+    down: Set<KEY> = new Set();
 
-    constructor() {
-        this.keys = {
-            keyup: [],
-            keydown: [],
-        };
-        this._update = {
-            keyup: [],
-            keydown: [],
-        };
+    add(key: string) {
+        this.down.add(mapKey[key]);
     }
 
-    update(deltatime: number) {
-        this.keys = this._update;
-        this._update = {
-            keyup: [],
-            keydown: [],
-        };
+    remove(key: string) {
+        this.down.delete(mapKey[key]);
     }
 
 }
@@ -28,11 +28,11 @@ class Keyboard {
 export const keyboard: Keyboard = new Keyboard();
 
 document.onkeyup = (event: KeyboardEvent) => {
-    keyboard._update.keyup.push(event.key);
+    keyboard.remove(event.key);
     console.log(`Key Up: ${event.key}`);
 }
 
 document.onkeydown = (event: KeyboardEvent) => {
-    keyboard._update.keydown.push(event.key);
+    keyboard.add(event.key);
     console.log(`Key Down: ${event.key}`);
 }

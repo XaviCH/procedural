@@ -6,6 +6,22 @@ import { vec3 } from "gl-matrix";
 export function marching_cubes(chunk: Chunk): Float32Array {
     
     const neighbors: Array<Chunk|null> = getChunkNeighbors(chunk);
+    const block_normals: number[][][] = [];
+    for(let x=0; x<CHUNK_SIZE_X; ++x) {
+        const y_array = [];
+        for(let y=0; y<CHUNK_SIZE_Y; ++y) {
+            const z_array = [];
+            for(let z=0; z<CHUNK_SIZE_Z; ++z) {
+                const nx = getRelativeBlock([x,y,z],[-1, 0, 0],neighbors) - getRelativeBlock([x,y,z],[ 1, 0, 0],neighbors);
+                const ny = getRelativeBlock([x,y,z],[ 0,-1, 0],neighbors) - getRelativeBlock([x,y,z],[ 0, 1, 0],neighbors);
+                const nz = getRelativeBlock([x,y,z],[ 0, 0,-1],neighbors) - getRelativeBlock([x,y,z],[ 0, 0, 1],neighbors);
+            
+                z_array.push(vec3.normalize(vec3.create(),vec3.fromValues(nx,ny,nz)));
+            }
+            y_array.push(z_array);
+        }
+        block_normals.push(y_array);
+    }
 
     let vbo: number[] = [];
 
@@ -34,6 +50,7 @@ export function marching_cubes(chunk: Chunk): Float32Array {
                     y+cube[edge[0]][1]+offset*direction[1],
                     z+cube[edge[0]][2]+offset*direction[2],
                 ]
+                normals[i] = getVetexNormal([x,y,z],edge.map(e => cube[e]),neighbors);
 
             }
         }
@@ -42,23 +59,52 @@ export function marching_cubes(chunk: Chunk): Float32Array {
 
         for (let i = 0; i < 15; i+=3) {
             if (triangles[i] < 0) break; // no more triangles
-            const p1 = vertices[triangles[i  ]];
-            const p2 = vertices[triangles[i+1]];
-            const p3 = vertices[triangles[i+2]];
+            const t1 = triangles[i  ];
+            const t2 = triangles[i+1];
+            const t3 = triangles[i+2];
             const normal: number[] = [0,0,0];
             //TODO arreglar normales
-            vec3.negate(normal,vec3.cross(normal,vec3.sub([0,0,0],p1,p2),vec3.sub([0,0,0],p1,p3)));
+            //vec3.negate(normal,vec3.cross(normal,vec3.sub([0,0,0],p1,p2),vec3.sub([0,0,0],p1,p3)));
+            
+            
             // Texture position
 
+
+
             vbo = vbo.concat(
-                p1, normal, 
-                p2, normal,
-                p3, normal,
+                vertices[t1], normals[t1],
+                vertices[t2], normals[t2],
+                vertices[t3], normals[t3],
                 )
         }
     }
 
     return new Float32Array(vbo);
+}
+
+function getBlockNormal(position: number[], neighbors: Array<Chunk|null>): vec3 {
+    const nx = getRelativeBlock(position,[-1, 0, 0],neighbors) - getRelativeBlock(position,[ 1, 0, 0],neighbors);
+    const ny = getRelativeBlock(position,[ 0,-1, 0],neighbors) - getRelativeBlock(position,[ 0, 1, 0],neighbors);
+    const nz = getRelativeBlock(position,[ 0, 0,-1],neighbors) - getRelativeBlock(position,[ 0, 0, 1],neighbors);
+
+    return vec3.normalize(vec3.create(),vec3.fromValues(nx,ny,nz));
+}
+
+function getVetexNormal(position: number[], vertices: number[][], neighbors: Array<Chunk|null>): number[] {
+    const dx = vertices[1][0] - vertices[0][0];
+    const dy = vertices[1][1] - vertices[0][1];
+    const dz = vertices[1][2] - vertices[0][2];
+    const X = dx ? [-1,0,1] : [0,vertices[0][0] ? 1 : -1]; 
+    const Y = dy ? [-1,0,1] : [0,vertices[0][1] ? 1 : -1]; 
+    const Z = dz ? [-1,0,1] : [0,vertices[0][2] ? 1 : -1]; 
+
+    const normal = [0,0,0]
+    for (const x of X) for (const y of Y) for (const z of Z) {
+        const block_position = [position[0]+x,position[1]+y,position[2]+z];
+        vec3.add(normal, normal, getBlockNormal(block_position, neighbors))
+    }
+    
+    return vec3.normalize(normal,normal);
 }
 
 function toBytes(density: number[]) {
@@ -119,18 +165,19 @@ function getRelativeBlock(position: number[], direction: number[], neighbors: Ar
     let z = position[2] + direction[2];
 
     let index = 13; // center
-    if (x === -1) { index -= 9; x = CHUNK_SIZE_X-1; }
-    else if (x === CHUNK_SIZE_X) { index += 9; x = 0; }
-    if (y === -1) { index -= 3; y = CHUNK_SIZE_Y-1;}
-    else if (y === CHUNK_SIZE_Y) { index += 3; y = 0; }
-    if (z === -1) { index -= 1; z = CHUNK_SIZE_Z-1; }
-    else if (z === CHUNK_SIZE_Z) {index += 1; z = 0;}
+    if (x <= -1) { index -= 9; x = CHUNK_SIZE_X+x; }
+    else if (x >= CHUNK_SIZE_X) { index += 9; x = x-CHUNK_SIZE_X; }
+    if (y <= -1) { index -= 3; y = CHUNK_SIZE_Y+y;}
+    else if (y >= CHUNK_SIZE_Y) { index += 3; y = y-CHUNK_SIZE_Y; }
+    if (z <= -1) { index -= 1; z = CHUNK_SIZE_Z+z; }
+    else if (z >= CHUNK_SIZE_Z) {index += 1; z = z-CHUNK_SIZE_Z;}
 
     const chunk = neighbors[index];
 
     if (chunk === null) return 0;
-
+    try {
     return chunk._blocks[x][y][z];
+    } catch { throw new Error()}
 }
 
 const cube: number[][] = [

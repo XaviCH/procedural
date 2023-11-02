@@ -2,7 +2,7 @@ import { mat4, vec3 } from "gl-matrix";
 import { cameraUniformBuffer, view } from "./camera";
 import { Mouse } from "../handlers/mouse";
 import { CURSOR_X, CURSOR_Y, device } from "../settings";
-import { keyboard } from "../handlers/keyboard";
+import { KEY, keyboard } from "../handlers/keyboard";
 
 export class Player {
     coords: number[] = [0,0,0]; 
@@ -11,26 +11,26 @@ export class Player {
 
     update(deltaTime: number) {
         
-        const down = keyboard.keys.keydown
+        const down = keyboard.down
         
         // movement
         const movement = vec3.normalize(vec3.create(),[this.view[0],0,this.view[2]]);
-        if (down.includes("w")) {
+        if (down.has(KEY.W)) {
             vec3.add(this.position,this.position, vec3.mul(vec3.create(),movement,[0.2,0,0.2]));
         }
-        if (down.includes("s")) {
+        if (down.has(KEY.S)) {
             vec3.add(this.position,this.position, vec3.mul(vec3.create(),movement,[-0.2,0,-0.2]));
         }
-        if (down.includes("a")) {
+        if (down.has(KEY.A)) {
             vec3.add(this.position,this.position, vec3.mul(vec3.create(),vec3.rotateY(vec3.create(),movement,[0,0,0],Math.PI/2),[0.2,0,0.2]));
         }
-        if (down.includes("d")) {
+        if (down.has(KEY.D)) {
             vec3.add(this.position,this.position, vec3.mul(vec3.create(),vec3.rotateY(vec3.create(),movement,[0,0,0],Math.PI/2),[-0.2,0,-0.2]));
         }
-        if (down.includes(" ")) {
+        if (down.has(KEY.SPACE)) {
             vec3.add(this.position,this.position, [0,0.1,0]);
         }
-        if (down.includes("Shift")) {
+        if (down.has(KEY.SHIFT)) {
             vec3.add(this.position,this.position, [0,-0.1,0]);
         }
         

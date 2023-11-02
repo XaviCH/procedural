@@ -4,16 +4,18 @@
 @binding(5) @group(0) var rock_sample: sampler;
 
 @fragment
-fn main(@location(0) tex_coord: vec2f, @location(1) dot_result: f32) -> @location(0) vec4f {
-    var grass_result: vec4<f32> = textureSample(grass_texture, grass_sample, tex_coord);
-    var rock_result: vec4<f32> = textureSample(rock_texture, rock_sample, tex_coord);
+fn main(@location(0) tex_coord: vec3f,@location(1) normal: vec3f, @location(2) dot_result: f32) -> @location(0) vec4f {
+    var grass_result: vec4<f32> = textureSample(grass_texture, grass_sample, vec2<f32>(tex_coord.x, tex_coord.z));
+    var rock_result: vec4<f32> = textureSample(rock_texture, rock_sample, vec2<f32>(tex_coord.x+tex_coord.z,tex_coord.y));
     var angle = (dot_result+1.0)/2.0;
+
+    var hpi = 3.14159/2.0;
+
     if (dot_result > 0.0) {
-        var scalar: f32 = dot_result*dot_result*dot_result;
-        var negate: f32 = 1.0 - scalar;
-        grass_result = vec4<f32>(grass_result.x*scalar, grass_result.y*scalar, grass_result.z*scalar, grass_result.w*scalar);
-        rock_result = vec4<f32>(rock_result.x*negate, rock_result.y*negate, rock_result.z*negate, rock_result.w*negate);
-        return grass_result+rock_result;
+
+        var a = smoothstep(1.0, 0.2, dot_result);
+        var color: vec3<f32> = mix(grass_result.rgb, rock_result.rgb, a);
+        return vec4<f32>(color,1.0);
     }
     return vec4<f32>(rock_result.x*angle, rock_result.y*angle, rock_result.z*angle, rock_result.w);
 

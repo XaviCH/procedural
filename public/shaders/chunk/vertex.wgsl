@@ -6,8 +6,9 @@ struct Camera {
 
 struct Fragment {
     @builtin(position) position: vec4f,
-    @location(0) tex_coord: vec2f,
-    @location(1) dot_result: f32
+    @location(0) tex_coord: vec3f,
+    @location(1) normal: vec3f,
+    @location(2) dot_result: f32
 };
 
 @binding(0) @group(0) var<uniform> camera: Camera;
@@ -29,11 +30,12 @@ fn main(@location(0) position: vec3f, @location(1) normal : vec3f) -> Fragment {
     if (i32(position.z) % 2 == 1) { offset_z += 1.0; }
 
 
-    output.tex_coord = vec2<f32>(
-      offset_x,
-      offset_z,
+    output.tex_coord = vec3<f32>(
+      position.x,
+      position.y,
+      position.z,
     );
-
+    output.normal = normal;
     output.dot_result = dot(normal, vec3<f32>(0.0,1.0,0.0));
 
     return output;

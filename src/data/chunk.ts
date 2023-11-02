@@ -124,7 +124,7 @@ export const pipeline = device.createRenderPipeline({
 })
 
 const grass_texture = new Material();
-await grass_texture.initialize("/assets/grass.png");
+await grass_texture.initialize("/assets/grass.jpg");
 
 const rock_texture = new Material();
-await rock_texture.initialize("/assets/rock.jpg");
+await rock_texture.initialize("/assets/rock_2.jpg");

@@ -9,7 +9,7 @@ import { Game } from './handlers/game';
 $(document).ready(async () => {  
   const app = Game.instance();
 
-  app.setup(document.getElementById("game"),10);
+  app.setup(document.getElementById("game"),3);
   app.run();
 
 })
